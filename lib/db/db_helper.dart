@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'dog.dart'; // Importa tu modelo Dog
-import 'user.dart'; // Importa tu modelo User
+import '../models/dog.dart'; // Importa tu modelo Dog
+import '../models/user.dart'; // Importa tu modelo User
 
 class DBHelper {
   static Database? _database;
@@ -24,8 +24,8 @@ class DBHelper {
             name TEXT,
             email TEXT,
             password TEXT,
-            phone TEXT,
-            postalCode TEXT
+            phone NUMBER,
+            postalCode NUMBER
           )
         ''');
 
@@ -34,7 +34,7 @@ class DBHelper {
           CREATE TABLE dogs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
-            birthDate TEXT,
+            birthDate DATE,
             age INTEGER,
             gender TEXT,
             weight REAL,
@@ -74,4 +74,26 @@ class DBHelper {
     final List<Map<String, dynamic>> dogMaps = await db.query('dogs');
     return dogMaps.map((map) => Dog.fromMap(map)).toList();
   }
+
+
+
+  // Método para validar el login
+static Future<User?> loginUser(String email, String password) async {
+  final db = await getDatabase();
+
+  // Buscar el usuario con el email y contraseña proporcionados
+  final List<Map<String, dynamic>> result = await db.query(
+    'users',
+    where: 'email = ? AND password = ?',
+    whereArgs: [email, password],
+  );
+
+  if (result.isNotEmpty) {
+    // Si se encontró el usuario, retornarlo como un objeto User
+    return User.fromMap(result.first);
+  }
+  // Si no se encontró el usuario, retorna null
+  return null;
+}
+
 }

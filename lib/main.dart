@@ -1,102 +1,86 @@
 import 'package:flutter/material.dart';
-import 'db_helper.dart'; // Tu archivo DBHelper
-import 'user.dart'; // Clase User
-import 'dog.dart'; // Clase Dog
+import 'screens/login_screen.dart'; // Importa la pantalla de login
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Happy Puppies',
-      theme: ThemeData(primarySwatch: Colors.blue,),
-      home: const HomeScreen(),
+      debugShowCheckedModeBanner: false,
+      home: WelcomeScreen(),
     );
   }
 }
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _testDatabase();
-  }
-
-  Future<void> _testDatabase() async {
-    // Crear un usuario de prueba
-    final user = User(
-      name: 'Alice',
-      email: 'alice@example.com',
-      password: 'securepassword',
-      phone: '555-1234',
-      postalCode: '12345',
-    );
-
-    // Insertar usuario en la base de datos
-    int userId = await DBHelper.insertUser(user);
-    print('Usuario insertado con ID: $userId');
-
-    // Crear un perro de prueba asociado al usuario
-    final dog = Dog(
-      name: 'Buddy',
-      birthDate: DateTime(2018, 6, 15),
-      age: 5,
-      gender: 'Male',
-      weight: 20.5,
-      size: 'Medium',
-      breed: 'Labrador',
-      color: 'Black',
-      photo: 'path/to/photo',
-    );
-
-    // Asociar el perro al usuario (añadir userId al perro)
-    final dogWithUserId = Dog(
-      id: userId,
-      name: dog.name,
-      birthDate: dog.birthDate,
-      age: dog.age,
-      gender: dog.gender,
-      weight: dog.weight,
-      size: dog.size,
-      breed: dog.breed,
-      color: dog.color,
-      photo: dog.photo,
-    );
-
-    int dogId = await DBHelper.insertDog(dogWithUserId);
-    print('Perro insertado con ID: $dogId');
-
-    // Recuperar y mostrar los datos en consola
-    final users = await DBHelper.getUsers();
-    print('Usuarios: $users');
-
-    final dogs = await DBHelper.getDogs();
-    print('Perros: $dogs');
-  }
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Happy Puppies'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: _testDatabase,
-          child: const Text('Probar Base de Datos'),
-        ),
+      body: Stack(
+        children: [
+          // Imagen de fondo
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/bienvenida_background.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Filtro oscuro
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.4),
+            ),
+          ),
+          // Texto en la parte superior
+          Positioned(
+            top: 100,
+            left: 20,
+            right: 20,
+            child: Text(
+              "La app para estar al tanto\nde tu compañero de vida.",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: "Poppins",
+                fontSize: 24,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          // Botón en la parte inferior derecha
+          Positioned(
+            bottom: 40,
+            right: 20,
+            child: ElevatedButton(
+              onPressed: () {
+                // Navegar a la pantalla de login
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                shape: const CircleBorder(),
+                padding: const EdgeInsets.all(20),
+                backgroundColor: Colors.black,
+              ),
+              child: const Icon(
+                Icons.arrow_forward,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
